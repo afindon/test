@@ -1,0 +1,32 @@
+@import 'testing';
+@import 'susy/sass/susy';
+
+// Note, we can omit the `_` and `.scss` when importing Sass partials 
+
+@import 'sprites';
+
+.testing {
+  color: #080;
+  width: percentage(5/7);
+
+}
+
+h1 {
+  color: #00f;
+}
+
+.test2 {
+  display: flex;
+}
+
+.border-radius {
+  -moz-border-radius: 12px;
+  -webkit-border-radius: 12px;
+  border-radius: 12px;
+}
+
+@include retina-sprites($retina-groups);
+
+.susy-test {
+  @include span(2);
+}
