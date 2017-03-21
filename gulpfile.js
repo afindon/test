@@ -17,6 +17,7 @@ var jscs = require('gulp-jscs');
 var scssLint = require('gulp-scss-lint');
 var sassLint = require('gulp-sass-lint');
 var Server = require('karma').Server;
+var gutil = require('gulp-util');
 
 function errorHandler(err) {
   // Logs out error in the command line
@@ -31,7 +32,7 @@ function customPlumber(errTitle) {
   if (process.env.CI) {
     return plumber({
       errorHandler: function(err) {
-        throw Error(err.message);
+        throw Error(gutil.colors.red(err.message));
       }
     });
   } else {
