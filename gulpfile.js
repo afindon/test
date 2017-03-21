@@ -156,6 +156,16 @@ gulp.task('default', function(callback) {
     );
   });
 
+gulp.task('dev-ci', function(callback) {
+    'use strict';
+runSequence(
+'clean:dev',
+['sprites', 'lint:js', 'lint:scss'],
+['sass', 'nunjucks'],
+callback
+);
+});
+
 gulp.task('lint:js', function() {
     'use strict';
     return gulp.src('app/js/**/*.js')
