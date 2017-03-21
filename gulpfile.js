@@ -25,15 +25,24 @@ function errorHandler(err) {
   this.emit('end');
 }
 
+// Custom Plumber function for catching errors
 function customPlumber(errTitle) {
-  return plumber({
-      errorHandler: notify.onError({
-          // Customizing error title
-          title: errTitle || 'Error running Gulp',
-          message: 'Error: <%= error.message %>',
-          sound: 'Hero'
-        })
+  'use strict';
+  if (process.env.CI) {
+    return plumber({
+      errorHandler: function(err) {
+        throw Error(err.message);
+      }
     });
+  } else {
+    return plumber({
+      errorHandler: notify.onError({
+        // Customizing error title
+        title: errTitle || 'Error running Gulp',
+        message: 'Error: <%= error.message %>',
+      })
+    });
+  }
 }
 
 //gulp.task('watch', ['browserSync', 'sass'], function() {
@@ -158,13 +167,13 @@ gulp.task('default', function(callback) {
 
 gulp.task('dev-ci', function(callback) {
     'use strict';
-runSequence(
-'clean:dev',
-['sprites', 'lint:js', 'lint:scss'],
-['sass', 'nunjucks'],
-callback
-);
-});
+    runSequence(
+    'clean:dev',
+    ['sprites', 'lint:js', 'lint:scss'],
+    ['sass', 'nunjucks'],
+    callback
+    );
+  });
 
 gulp.task('lint:js', function() {
     'use strict';
@@ -198,10 +207,10 @@ gulp.task('lint:sass', function() {
   return gulp.src('app/scss/**/*.scss')
   .pipe(sassLint({
 
-     options: {
-    formatter: 'stylish',
-    'merge-default-rules': true
-  },
+    options: {
+      formatter: 'stylish',
+      'merge-default-rules': true
+    },
     // Pointing to config file
     config: '.sass-lint.yml'
   }))
