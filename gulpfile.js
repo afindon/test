@@ -116,7 +116,7 @@ gulp.task('browserSync', function() {
             baseDir: 'app'
           },
         //      proxy: "dh.local:80",
-        browser: ['google chrome', 'firefox', 'safari']
+        browser: ['google chrome']
 
       });
   });

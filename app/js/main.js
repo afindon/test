@@ -1,6 +1,7 @@
 // main.js
+'use strict';
+
 $(document).ready(function() {
-  'use strict';
 
   // comparing with == generates a warning
   if ('testing' === 'testing') {
@@ -10,6 +11,5 @@ $(document).ready(function() {
 });
 
 function add(num1, num2) {
-  'use strict';
   return num1 + num2;
 }
