@@ -18,6 +18,18 @@ var scssLint = require('gulp-scss-lint');
 var sassLint = require('gulp-sass-lint');
 var Server = require('karma').Server;
 var gutil = require('gulp-util');
+var useref = require('gulp-useref');
+var uglify = require('gulp-uglify');
+var debug = require('gulp-debug');
+var cached = require('gulp-cached');
+var unCss = require('gulp-uncss');
+var minifyCss = require('gulp-minify-css');
+var imagemin = require('gulp-imagemin');
+var cache = require('gulp-cache');
+var newer = require('gulp-newer');
+var rev = require('gulp-rev');
+var revReplace = require('gulp-rev-replace');
+var rsync = require('rsyncwrapper');
 
 function errorHandler(err) {
   // Logs out error in the command line
@@ -226,4 +238,89 @@ gulp.task('test', function(done) {
     configFile: process.cwd() + '/karma.conf.js',
     singleRun: true
   }, done).start();
+});
+
+gulp.task('useref', function() {
+    var assets = useref.assets();
+    return gulp.src('app/*.html')
+        .pipe(assets)
+        .pipe(cached('useref'))
+        .pipe(debug({ 'title': 'before assets' }))
+        .pipe(gulpIf('*.js', uglify()))
+        .pipe(gulpIf('*.css', unCss({
+            html: ['app/*.html'],
+            ignore: [
+                '.susy-test',
+                /.is-/,
+                /.has-/
+            ]
+        })))
+        .pipe(gulpIf('*.css', minifyCss()))
+        .pipe(rev())
+        .pipe(assets.restore())
+        .pipe(useref())
+        .pipe(revReplace())
+        // end useref stuff
+        .pipe(gulp.dest('dist'));
+});
+
+gulp.task('images', function() {
+    'use strict';
+    return gulp.src('app/images/**/*.+(png|jpg|jpeg|gif|svg)')
+        .pipe(newer('dist/images'))
+        .pipe(imagemin())
+        .pipe(gulp.dest('dist/images'))
+});
+
+
+gulp.task('fonts', function() {
+    'use strict';
+    // copies entire folder
+    return gulp.src('app/fonts/**/*')
+        .pipe(gulp.dest('dist/fonts'))
+});
+
+gulp.task('clean:dist', function() {
+    return del.sync([
+        'dist/**/*',
+        '!dist/images',
+        // Excluding images from glob
+        '!dist/images/**/*'
+    ])
+});
+
+gulp.task('build', function(callback) {
+    'use strict';
+    runSequence(
+        ['clean:dev', 'clean:dist'], ['sprites', 'lint:js', 'lint:scss'], ['sass', 'nunjucks'], ['useref', 'images', 'fonts', 'test'],
+        callback
+    );
+});
+
+
+gulp.task('browserSync:dist', function() {
+'use strict';
+    browserSync.init({
+        server: {
+            baseDir: 'dist'
+          }
+    })
+});
+
+gulp.task('rsync', function() {
+'use strict';
+rsync({
+src: 'dist/',
+dest: 'synced-folder',
+recursive: true,
+}
+,function (error,stdout,stderr,cmd) {
+    if ( error ) {
+        // failed
+        console.log(error.message);
+    } else {
+        // success
+    }
+  }
+)
 });

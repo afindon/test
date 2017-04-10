@@ -4,12 +4,18 @@
 <head>
 <meta charset="UTF-8">
 <title>Document</title>
+<!-- build:css css/styles.min.css -->
 <link rel="stylesheet" href="css/styles.css">
-</head>
+<!-- endbuild --></head>
 <body>
 <!-- You write code for this content block in another file -->
 {% block content %} {% endblock %}
+<div class="testing"></div>
+<!-- build:js js/main.min.js -->
 <script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="js/second.js"></script>
 <script src="js/main.js"></script>
+<script src="js/testing.js"></script>
+<!-- endbuild -->
 </body>
 </html>
